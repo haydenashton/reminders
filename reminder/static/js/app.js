@@ -8,22 +8,49 @@ $(function(){
 
 
   Reminder = Backbone.Model.extend({
-    defaults: {
-        title: "",
-        description: "",
-        user_id: "",
-        reminder_time: "01/01/2015 00:00",
-        reminder_deleted: false,
-        reminder_sent: false,
-        created: ""
+    defaults: function(){
+      var today = moment().format("DD/MM/YYYYTHH:mm");
+      return {
+          title: "",
+          description: "",
+          user_id: "",
+          reminder_time: today,
+          reminder_deleted: false,
+          reminder_sent: false,
+          created: ""
+      };
     },
-      url: "/reminders"
+    url: "/reminders",
+
+    getSplitDate: function(){
+      return this.get("reminder_time").split("T");
+    },
+
+    getDate: function(){
+        return this.getSplitDate()[0];
+    },
+
+    getTime: function(){
+      return this.getSplitDate()[1];
+    },
+
+    setDate: function(value){
+      var current = this.getSplitDate();
+      current[0] = value;
+      this.set("reminder_time", current.join("T"));
+    },
+
+    setTime: function(value){
+      var current = this.getSplitDate();
+      current[1] = value;
+      this.set("reminder_time", current.join("T"));
+    }
   });
 
   ReminderList = Backbone.Collection.extend({
     url : "/reminders",
     model : Reminder,
-    //comparator: "created"
+
     comparator: function(arg){
         return Date.parse(arg.get('created'));
     }
@@ -69,7 +96,13 @@ $(function(){
       'change .time-part-field': 'setDateTime'
     },
 
-    render : function(){
+    show: function(){
+      $("#reminder_add").html(this.render().el);
+      $("#reminder_time").timepicker({showMeridian: false, minuteStep: 1});
+      $("#reminder-date").datepicker({container: "#date_time"});
+    },
+
+    render: function(){
       var content = this.model.toJSON();
       $(this.el).html(this.template(content));
       return this;
@@ -92,20 +125,17 @@ $(function(){
 
     setDateTime: function(e){
       var element = $(e.currentTarget);
-      var target = parseInt(element.data("target"));
+
+      // Index in date string
+      var target = element.data("target");
       var value = element.val();
-      var current = this.model.get("reminder_time");
-      var updated = current.split(" ");
-      updated[target] = value;
-      this.model.set("reminder_time", updated.join(" "));
-    },
 
-    datePart: function(){
-        return this.model.get("reminder_time").split(" ")[0];
-    },
-
-    timePart: function(){
-        return this.model.get("reminder_time").split(" ")[1];
+      if(target === "date"){
+        this.model.setDate(value);
+      }
+      else {
+        this.model.setTime(value);
+      }
     }
   });
 
@@ -162,8 +192,7 @@ $(function(){
   reminders = new ReminderList();
   var view_index = new ReminderTable();
   var add_view = new ReminderAddView({model: new Reminder()});
-  $("#reminder_add").html(add_view.render().el);
-  $("#reminder_time").timepicker({showMeridian: false, minuteStep: 1});
+  add_view.show();
   new App();
 
 });

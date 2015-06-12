@@ -8,7 +8,7 @@ class EmailReminder(object):
         self.reminder = args['reminder']
         self.user = args['user']
         self.settings = args['settings']
-        print self.settings['email.server'], self.settings['email.port'], self.settings['email.username'], self.settings['email.password']
+
         self.mailserver = smtplib.SMTP(self.settings['email.server'],
                                        self.settings['email.port'])
         self.mailserver.ehlo()

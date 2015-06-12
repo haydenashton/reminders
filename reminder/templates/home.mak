@@ -1,7 +1,6 @@
 <%inherit file="template.mak"/>
 <%block name="content">
 
-
     <div>
         <div class="fixed">
             <h1>Reminders</h1>
@@ -22,16 +21,13 @@
             </div>
             <div class="form-group">
                 <label>Reminder Time:</label>
-                <div>
-                    <input type="text" data-target="0" data-provide="datepicker" data-container="#reminder_add" data-date-format="dd/mm/yyyy" class="form-control input time-part time-part-field" id="reminder-date" placeholder="dd/mm/yyyy" value="{{ this.datePart() }}"/>
+                <div id="date_time">
+                    <input data-target="date" type="text" class="form-control input time-part time-part-field" id="reminder-date" data-date-format="dd/mm/yyyy" placeholder="dd/mm/yyyy" value="{{ this.model.getDate() }}"/>
 
                     <div class="time-part input-group bootstrap-timepicker">
-                        <input data-target="1" style="display:inline;" type="text" class="form-control input time-part-field" id="reminder_time" placeholder="hh:mm" name="time" value="{{ this.timePart() }}" />
+                        <input data-target="time" style="display:inline;" type="text" class="form-control input time-part-field" id="reminder_time" placeholder="hh:mm" name="time" value="{{ this.model.getTime() }}" />
                         <span class="inline input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
                     </div>
-
-
-                    <!--<input id="timepicker1" type="text" class="input-small">-->
 
                 </div>
             </div>
@@ -54,7 +50,7 @@
         </div>
         <div>
             <label>Reminder Time:</label>
-            {{ reminder_time }}
+            {{ reminder_time.replace('T', ' at ') }}
         </div>
         <div>
             <small>Created {{ created.replace('T', ' at ') }}</small>
@@ -71,5 +67,6 @@
     <link rel="stylesheet" href="${request.static_url('reminder:static/css/bootstrap-timepicker.min.css')}"/>
     <script type="text/javascript" src="${request.static_url('reminder:static/js/lib/bootstrap-datepicker.min.js')}"></script>
     <script type="text/javascript" src="${request.static_url('reminder:static/js/lib/bootstrap-timepicker.min.js')}"></script>
+    <script type="text/javascript" src="${request.static_url('reminder:static/js/lib/moment-min.js')}"></script>
     <script type="text/javascript" src="${request.static_url('reminder:static/js/app.js')}"></script>
 </%block>

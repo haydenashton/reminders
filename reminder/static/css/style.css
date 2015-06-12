@@ -25,5 +25,5 @@ input.time-part, div.time-part { width:49%; display:inline-block; }
 span.inline { display:inline; }
 #reminder_time { width:72%; }
 .login-form { width: 33%; }
-#content { margin-top: 75px; }
+body { margin-top: 75px; }
 .fixed { position:fixed; }

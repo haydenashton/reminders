@@ -93,7 +93,7 @@ class Reminder(Base):
     user = relationship("User", backref=backref('reminders', order_by=id))
 
     def __init__(self, args):
-        reminder_time = datetime.datetime.strptime(args['reminder_time'], "%d/%m/%Y %H:%M")
+        reminder_time = datetime.datetime.strptime(args['reminder_time'], "%d/%m/%YT%H:%M")
         super(Reminder, self).__init__(title=args['title'],
                                        description=args['description'],
                                        reminder_time=reminder_time)
@@ -104,7 +104,7 @@ class Reminder(Base):
             "user_id": self.user_id,
             "title": self.title,
             "description": self.description,
-            "reminder_time": self.reminder_time.strftime("%d/%m/%Y %H:%M"),
+            "reminder_time": self.reminder_time.strftime("%d/%m/%YT%H:%M"),
             "created": self.created.isoformat(),
             "reminder_sent": self.reminder_sent,
             "reminder_deleted": self.reminder_deleted
