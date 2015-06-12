@@ -2,11 +2,6 @@ import datetime
 
 from passlib.apps import custom_app_context as pwd_context
 
-from pyramid.security import (
-    Allow,
-    Everyone
-)
-
 from sqlalchemy import (
     Column,
     ForeignKey,
@@ -137,17 +132,3 @@ def user_groups(user_email, request):
 # Indexes
 Index('email_index', User.email, unique=True)
 Index('date_time_index', Reminder.reminder_time)
-
-
-class RootFactory(object):
-    """
-    Set up what permissions groups have.
-    """
-    __acl__ = [
-        (Allow, 'users', 'view'),
-        (Allow, 'users', 'edit'),
-        (Allow, 'admins', 'admin')
-    ]
-
-    def __init__(self, request):
-        pass

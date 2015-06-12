@@ -15,17 +15,14 @@ from .models import (
 
 @view_config(route_name='home', renderer='home.mak', permission='edit')
 def my_view(request):
-    try:
-        one = DBSession.query(Reminder).all()
-    except DBAPIError, dbapie:
-        print dbapie
-        return Response("Error connecting to DB", content_type='text/plain', status_int=500)
-
-    return {'one': one, 'project': 'reminder', 'logged_in': request.authenticated_userid}
+    return {'project': 'reminder', 'logged_in': request.authenticated_userid}
 
 
 @view_config(route_name='users', renderer='json', permission='admin')
 def list_users(request):
+    """
+    Return a json list of Users. Only admins can view
+    """
     try:
         users = DBSession.query(User).all()
     except DBAPIError, dbapie:
@@ -39,7 +36,7 @@ class ReminderViews(object):
     def __init__(self, request):
         self.request = request
 
-    @view_config(route_name='reminders', request_method='POST')
+    @view_config(route_name='reminders', request_method='POST', permission='edit')
     def create_reminder(self):
         reminder = Reminder(self.request.json_body)
         user = DBSession.query(User).filter(User.email == self.request.authenticated_userid).first()
@@ -47,7 +44,7 @@ class ReminderViews(object):
             user.reminders.append(reminder)
         return {}
 
-    @view_config(route_name='reminders', request_method='PUT')
+    @view_config(route_name='reminders', request_method='PUT', permission='edit')
     def update_reminder(self):
         user = DBSession.query(User).filter(User.email == self.request.authenticated_userid).first()
         reminder = DBSession.query(Reminder).get(self.request.json_body['id'])

@@ -28,7 +28,7 @@ def main(global_config, **settings):
         'ABigSecret', callback=user_groups, hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
 
-    config = Configurator(settings=settings, root_factory='reminder.models.RootFactory')
+    config = Configurator(settings=settings, root_factory='reminder.access_list.RootFactory')
 
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
