@@ -24,7 +24,7 @@ class MyScheduler(object):
     def create_job(self):
         self.scheduler.add_job(handle_reminders,
                                trigger=IntervalTrigger(minutes=1),
-                               args=(self.settings, )
+                               args=(self.reminder_types, self.settings)
         )
 
     def start(self):
@@ -44,7 +44,7 @@ class MyScheduler(object):
         self.reminder_types.append(reminder_type)
 
 
-def handle_reminders(settings):
+def handle_reminders(reminder_types, settings):
     """
     Job to send reminders. Runs every minute.
     :return: None
@@ -56,7 +56,7 @@ def handle_reminders(settings):
                                                  (Reminder.reminder_time < datetime.now())).all()
 
     queue = Queue()
-    threads = create_reminder_threads(reminders, queue, settings)
+    threads = create_reminder_threads(reminders, reminder_types, queue, settings)
 
     # Wait for all threads to complete then process results in one go
     for thrd in threads:
@@ -66,7 +66,7 @@ def handle_reminders(settings):
     process_results(reminders, results)
 
 
-def create_reminder_threads(reminders, queue, settings):
+def create_reminder_threads(reminders, reminder_types, queue, settings):
     """
     Create one thread per reminder that needs to be sent
     :param reminders: list of reminders to process
@@ -79,6 +79,7 @@ def create_reminder_threads(reminders, queue, settings):
         # Create new threads. SQLite objects can only be used in thread they were created in so use dictionary values
         thrd = threading.Thread(target=send_reminder, args=(reminder.as_dict(),
                                                             reminder.user.as_dict(),
+                                                            reminder_types,
                                                             queue, lock,
                                                             settings))
         thrd.start()
@@ -123,7 +124,7 @@ def process_results(reminders, results):
     transaction.commit()
 
 
-def send_reminder(reminder, user, queue, lock, settings):
+def send_reminder(reminder, user, reminder_types, queue, lock, settings):
     """
     Send reminder to user using all registered strategies.
     :param reminder: dict representation of the reminder
@@ -144,6 +145,7 @@ def send_reminder(reminder, user, queue, lock, settings):
                 result = True
                 print "Sent reminder: %s" % reminder['id']
             except Exception, e:
+                print e
                 print "Could not send reminder using %s for %s", (repr(reminder_type), reminder['id'])
 
         queue.put((reminder['id'], result))
