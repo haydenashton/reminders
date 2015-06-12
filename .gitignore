@@ -1,0 +1,5 @@
+.idea/
+*.pyc
+reminder.egg*
+reminder.sqlite
+config.ini
